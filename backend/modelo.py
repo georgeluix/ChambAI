@@ -10,7 +10,12 @@ from typing import Any
 
 import httpx
 
-from extractor import BANDERAS_CRITICAS, BANDERAS_GRAVES, BANDERAS_LEVES
+from extractor import (
+    BANDERAS_CRITICAS,
+    BANDERAS_GRAVES,
+    BANDERAS_LEVES,
+    es_aviso_laboral,
+)
 
 
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434").rstrip("/")
@@ -30,10 +35,20 @@ KEEP_ALIVE = os.getenv("CHAMBA_KEEP_ALIVE", "10m")
 _TURNO_INFERENCIA = asyncio.Semaphore(1)
 
 PROMPT_EXTRACCION = (
-    "Transcribe exactamente el texto de este aviso de trabajo. Copia el texto "
-    "tal cual aparece, conservando errores de ortografia, mayusculas y emojis. "
-    "No interpretes, no resumas, no agregues comentarios. Si la imagen no "
-    "contiene un aviso de trabajo, responde solo: SIN_AVISO"
+    "Realiza OCR de la imagen y transcribe TODO el texto visible. No decidas si "
+    "es un aviso de trabajo: solo lee. Incluye letras pequenas del encabezado, "
+    "centro y pie, aunque haya personas, logotipos, decoracion o poco contraste. "
+    "Conserva palabras, numeros y saltos de linea. No interpretes, no resumas y "
+    "no describas la imagen. Si existe cualquier texto legible, transcribelo. "
+    "Responde solo SIN_TEXTO cuando no haya absolutamente ningun texto legible."
+)
+
+PROMPT_EXTRACCION_REINTENTO = (
+    "Observa nuevamente la imagen con maxima atencion y actua solo como OCR. "
+    "Ignora fotografias, fondos brillantes y adornos. Busca letras pequenas en "
+    "la parte superior, central e inferior. Transcribe literalmente todas las "
+    "palabras y numeros que puedas leer, sin decidir de que trata la imagen ni "
+    "agregar comentarios. Solo si no hay ninguna letra legible responde SIN_TEXTO."
 )
 
 
@@ -171,13 +186,29 @@ async def _generar(
 
 
 async def transcribir_imagen(imagen: bytes) -> str:
-    return await _generar(
+    primera = await _generar(
         MODELO_BASE,
         PROMPT_EXTRACCION,
         temperature=0,
         imagen=imagen,
         num_predict=MAX_PREDICCION_EXTRACCION,
     )
+    if es_aviso_laboral(primera):
+        return primera
+
+    # Una segunda mirada recupera afiches con tipografia pequena o fondos
+    # decorativos. Solo ocurre cuando la primera transcripcion no contiene
+    # suficientes señales laborales.
+    segunda = await _generar(
+        MODELO_BASE,
+        PROMPT_EXTRACCION_REINTENTO,
+        temperature=0,
+        imagen=imagen,
+        num_predict=MAX_PREDICCION_EXTRACCION,
+    )
+    if segunda.strip().upper() not in {"SIN_TEXTO", "SIN_AVISO"}:
+        return segunda
+    return primera
 
 
 async def analizar_aviso(texto: str, temperature: float = 0) -> str:

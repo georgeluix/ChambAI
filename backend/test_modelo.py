@@ -3,7 +3,7 @@
 
 import asyncio
 import unittest
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 import httpx
 
@@ -53,6 +53,25 @@ class ModeloOllamaTest(unittest.TestCase):
         self.assertEqual(cuerpo["messages"][0]["role"], "user")
         self.assertIn("images", cuerpo["messages"][0])
         self.assertNotIn("prompt", cuerpo)
+
+    def test_reintenta_ocr_si_la_primera_lectura_no_parece_aviso(self):
+        generar = AsyncMock(
+            side_effect=[
+                "SIN_AVISO",
+                "LUXURY CLUB\nANFITRIONAS\nBUEN SUELDO\nCOMISIONES AL 40%",
+            ]
+        )
+        with patch.object(modelo, "_generar", generar):
+            salida = asyncio.run(modelo.transcribir_imagen(b"imagen"))
+        self.assertIn("ANFITRIONAS", salida)
+        self.assertEqual(generar.await_count, 2)
+
+    def test_no_reintenta_ocr_cuando_ya_detecta_oferta(self):
+        generar = AsyncMock(return_value="Estamos en busca de personal. Buen sueldo.")
+        with patch.object(modelo, "_generar", generar):
+            salida = asyncio.run(modelo.transcribir_imagen(b"imagen"))
+        self.assertIn("busca de personal", salida)
+        self.assertEqual(generar.await_count, 1)
 
 
 if __name__ == "__main__":

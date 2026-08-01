@@ -10,6 +10,7 @@ from extractor import (
     canonizar_bandera,
     detectar_cobro_postulante,
     detectar_menores,
+    es_aviso_laboral,
     parsear_salida_modelo,
 )
 
@@ -69,6 +70,16 @@ class ReglasDeterministasTest(unittest.TestCase):
     def test_cobro_al_postulante(self):
         self.assertTrue(detectar_cobro_postulante("Deposita S/ 50 para el uniforme"))
         self.assertFalse(detectar_cobro_postulante("Sueldo S/ 1800 en planilla"))
+
+    def test_reconoce_afiche_laboral_estilizado(self):
+        transcripcion = (
+            "LUXURY CLUB\nANFITRIONAS\nBUEN SUELDO FIJO\nCOMISIONES AL 40%\n"
+            "EXCELENTE AMBIENTE LABORAL\nESCRIBENOS PARA MAS INFORMACION"
+        )
+        self.assertTrue(es_aviso_laboral(transcripcion))
+        self.assertTrue(es_aviso_laboral("Estamos en busca de anfitrionas"))
+        self.assertFalse(es_aviso_laboral("Menu del dia: arroz con pollo y refresco"))
+        self.assertFalse(es_aviso_laboral("SIN_TEXTO"))
 
     def test_canoniza_variantes_historicas(self):
         self.assertEqual(

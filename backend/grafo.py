@@ -15,6 +15,7 @@ from extractor import (
     aplicar_reglas,
     calcular_puntaje,
     canonizar_bandera,
+    es_aviso_laboral,
     gravedad_de_bandera,
     normalizar,
     parsear_salida_modelo,
@@ -42,7 +43,7 @@ async def extraer(estado: EstadoAnalisis) -> dict[str, Any]:
         return {"texto": estado["texto"], "aviso_detectado": True}
 
     transcripcion = await transcribir_imagen(estado["imagen"])
-    detectado = transcripcion.strip().upper() != "SIN_AVISO"
+    detectado = es_aviso_laboral(transcripcion)
     return {"texto": transcripcion, "aviso_detectado": detectado}
 
 

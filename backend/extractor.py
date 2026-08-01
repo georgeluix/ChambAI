@@ -165,6 +165,34 @@ def normalizar(texto: str) -> str:
     )
 
 
+def es_aviso_laboral(texto: str) -> bool:
+    """Reconoce un aviso por su texto sin delegar esa decision al modelo visual."""
+    limpio = normalizar(texto)
+    if limpio.strip().upper() in {"SIN_TEXTO", "SIN_AVISO"}:
+        return False
+
+    patrones_directos = (
+        r"\b(?:se\s+)?(?:busca|buscamos|necesita|necesitamos|requiere|contrata)\b",
+        r"\b(?:estamos|empresa)\s+en\s+busca\b",
+        r"\b(?:vacante|vacantes|convocatoria|postula|postulacion)\b",
+        r"\b(?:envia|enviar|manda|mandar)\s+(?:tu\s+)?cv\b",
+        r"\btrabaja\s+con\s+nosotros\b",
+    )
+    if any(re.search(patron, limpio) for patron in patrones_directos):
+        return True
+
+    grupos_laborales = (
+        r"\b(?:sueldo|salario|remuneracion|pago)\b",
+        r"\b(?:comision|comisiones|propina|propinas)\b",
+        r"\b(?:horario|turno|jornada)\b",
+        r"\b(?:requisito|requisitos|experiencia)\b",
+        r"\b(?:planilla|beneficios|essalud|cts)\b",
+        r"\b(?:empleo|trabajo|puesto|cargo|laboral)\b",
+    )
+    coincidencias = sum(bool(re.search(patron, limpio)) for patron in grupos_laborales)
+    return coincidencias >= 2
+
+
 def _rango_incluye_menor(texto: str) -> bool:
     patron = re.compile(
         r"(?<![\d:])\b(?:entre\s+|de\s+)?(?P<inicio>\d{1,2})\s*"
