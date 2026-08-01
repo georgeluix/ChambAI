@@ -1,0 +1,703 @@
+{
+ "fuente": "PNP - MININTER, Datos Abiertos del Estado Peruano",
+ "dataset": "Denuncias por trata de personas 2017-2023",
+ "periodo": "2017-2023",
+ "nacional": {
+  "captacion": {
+   "total": 3822,
+   "distribucion": {
+    "oferta de trabajo": {
+     "n": 2787,
+     "pct": 72.9
+    },
+    "otro": {
+     "n": 789,
+     "pct": 20.6
+    },
+    "internet": {
+     "n": 110,
+     "pct": 2.9
+    },
+    "oferta de estudio": {
+     "n": 64,
+     "pct": 1.7
+    },
+    "seduccion": {
+     "n": 56,
+     "pct": 1.5
+    },
+    "padrinazgo": {
+     "n": 16,
+     "pct": 0.4
+    }
+   }
+  },
+  "medio": {
+   "total": 3822,
+   "distribucion": {
+    "engaño": {
+     "n": 2302,
+     "pct": 60.2
+    },
+    "otro": {
+     "n": 651,
+     "pct": 17.0
+    },
+    "concesion o recepcion de pagos": {
+     "n": 379,
+     "pct": 9.9
+    },
+    "amenaza": {
+     "n": 259,
+     "pct": 6.8
+    },
+    "privacion de la libertad": {
+     "n": 96,
+     "pct": 2.5
+    },
+    "violencia": {
+     "n": 70,
+     "pct": 1.8
+    },
+    "fraude": {
+     "n": 35,
+     "pct": 0.9
+    },
+    "abuso de poder": {
+     "n": 30,
+     "pct": 0.8
+    }
+   }
+  },
+  "finalidad": {
+   "total": 3822,
+   "distribucion": {
+    "explotacion sexual": {
+     "n": 2285,
+     "pct": 59.8
+    },
+    "explotacion laboral": {
+     "n": 884,
+     "pct": 23.1
+    },
+    "no identificado": {
+     "n": 468,
+     "pct": 12.2
+    },
+    "mendicidad": {
+     "n": 99,
+     "pct": 2.6
+    },
+    "trabajos y servicios forzados": {
+     "n": 47,
+     "pct": 1.2
+    },
+    "venta de niños": {
+     "n": 34,
+     "pct": 0.9
+    },
+    "trafico de organos tejido humano": {
+     "n": 5,
+     "pct": 0.1
+    }
+   }
+  },
+  "lugar_explotacion": {
+   "total": 3466,
+   "distribucion": {
+    "otro/especificar": {
+     "n": 2745,
+     "pct": 79.2
+    },
+    "night club": {
+     "n": 267,
+     "pct": 7.7
+    },
+    "prostibulo": {
+     "n": 207,
+     "pct": 6.0
+    },
+    "servicio domestico": {
+     "n": 86,
+     "pct": 2.5
+    },
+    "mendicidad/ via publica": {
+     "n": 65,
+     "pct": 1.9
+    },
+    "discoteca": {
+     "n": 28,
+     "pct": 0.8
+    },
+    "trabajo en mercados": {
+     "n": 16,
+     "pct": 0.5
+    },
+    "mineria artesanal": {
+     "n": 13,
+     "pct": 0.4
+    },
+    "actividad agropecuaria": {
+     "n": 10,
+     "pct": 0.3
+    },
+    "centro de masajes": {
+     "n": 9,
+     "pct": 0.3
+    },
+    "centro de produccion de pornografia": {
+     "n": 6,
+     "pct": 0.2
+    },
+    "estudio de modelaje": {
+     "n": 5,
+     "pct": 0.1
+    },
+    "actividad pesquera": {
+     "n": 3,
+     "pct": 0.1
+    },
+    "talleres pirotecnicos": {
+     "n": 2,
+     "pct": 0.1
+    },
+    "fabrica artesanal de ladrilos": {
+     "n": 2,
+     "pct": 0.1
+    },
+    "tala ilegal de la madera": {
+     "n": 2,
+     "pct": 0.1
+    }
+   }
+  },
+  "instruccion": {
+   "total": 3822,
+   "distribucion": {
+    "secundaria": {
+     "n": 2890,
+     "pct": 75.6
+    },
+    "primaria": {
+     "n": 616,
+     "pct": 16.1
+    },
+    "no especifica": {
+     "n": 263,
+     "pct": 6.9
+    },
+    "superior": {
+     "n": 53,
+     "pct": 1.4
+    }
+   }
+  },
+  "reclutamiento": {
+   "total": 3949,
+   "distribucion": {
+    "nacional": {
+     "n": 3272,
+     "pct": 82.9
+    },
+    "internacional": {
+     "n": 677,
+     "pct": 17.1
+    }
+   }
+  },
+  "vinculo": {
+   "total": 3822,
+   "distribucion": {
+    "otro": {
+     "n": 3235,
+     "pct": 84.6
+    },
+    "conocido": {
+     "n": 460,
+     "pct": 12.0
+    },
+    "familiar": {
+     "n": 108,
+     "pct": 2.8
+    },
+    "tutor": {
+     "n": 11,
+     "pct": 0.3
+    },
+    "conyuge": {
+     "n": 8,
+     "pct": 0.2
+    }
+   }
+  },
+  "edad_mujeres": {
+   "total": 2671,
+   "distribucion": {
+    "de 18 a 29 años": {
+     "n": 1458,
+     "pct": 54.6
+    },
+    "de 12 a 17 años": {
+     "n": 832,
+     "pct": 31.1
+    },
+    "de 30 a 59 años": {
+     "n": 275,
+     "pct": 10.3
+    },
+    "de 6 a 11 años": {
+     "n": 80,
+     "pct": 3.0
+    },
+    "de 0 a 5 años": {
+     "n": 22,
+     "pct": 0.8
+    },
+    "de 60 a mas": {
+     "n": 4,
+     "pct": 0.1
+    }
+   }
+  },
+  "edad_hombres": {
+   "total": 426,
+   "distribucion": {
+    "de 18 a 29 años": {
+     "n": 166,
+     "pct": 39.0
+    },
+    "de 12 a 17 años": {
+     "n": 131,
+     "pct": 30.8
+    },
+    "de 30 a 59 años": {
+     "n": 76,
+     "pct": 17.8
+    },
+    "de 6 a 11 años": {
+     "n": 27,
+     "pct": 6.3
+    },
+    "de 0 a 5 años": {
+     "n": 22,
+     "pct": 5.2
+    },
+    "de 60 a mas": {
+     "n": 4,
+     "pct": 0.9
+    }
+   }
+  },
+  "denuncias_total": 3822,
+  "por_anio": {
+   "2017": 568,
+   "2018": 589,
+   "2019": 398,
+   "2020": 258,
+   "2021": 368,
+   "2022": 464,
+   "2023": 142
+  },
+  "victimas": {
+   "mujeres_pct": 86.2,
+   "hombres_pct": 13.8
+  }
+ },
+ "departamentos": {
+  "LIMA": {
+   "denuncias": 1949,
+   "por_oferta_de_trabajo": 1569,
+   "pct_oferta_de_trabajo": 80.5,
+   "ranking_nacional": 1,
+   "pct_del_total_nacional": 51.0,
+   "provincias": {
+    "LIMA": 1682,
+    "LIMA-COMAS": 109,
+    "LIMA-CANTA-CAÑETE-HUAURA": 43,
+    "LIMA-HUARAL": 31,
+    "HUAROCHIRI": 20,
+    "LIMA-CENTRO": 8
+   }
+  },
+  "LAMBAYEQUE": {
+   "denuncias": 213,
+   "por_oferta_de_trabajo": 179,
+   "pct_oferta_de_trabajo": 84.0,
+   "ranking_nacional": 2,
+   "pct_del_total_nacional": 5.6,
+   "provincias": {
+    "CHICLAYO": 202,
+    "FERREÑAFE": 2,
+    "LAMBAYEQUE": 1
+   }
+  },
+  "CUSCO": {
+   "denuncias": 187,
+   "por_oferta_de_trabajo": 137,
+   "pct_oferta_de_trabajo": 73.3,
+   "ranking_nacional": 3,
+   "pct_del_total_nacional": 4.9,
+   "provincias": {
+    "CUZCO": 42,
+    "CUSCO": 38,
+    "ESPINAR-CUSCO": 35,
+    "CUZCO-ESPINAR": 11,
+    "CUSCO-CALCA-ESPINAR-LA CONVENCION": 6,
+    "ESPINAR-CUZCO": 5,
+    "LA CONVENCION": 5,
+    "CUZCO-CALCA": 4,
+    "ESPINAR-A CONVENCION": 3,
+    "ANTA": 3,
+    "CUSCO-LA CONVENCION": 3,
+    "CANCHIS": 2,
+    "ESPINAR": 2,
+    "LA CONVECION": 2,
+    "URUBAMBA": 2
+   }
+  },
+  "AREQUIPA": {
+   "denuncias": 141,
+   "por_oferta_de_trabajo": 89,
+   "pct_oferta_de_trabajo": 63.1,
+   "ranking_nacional": 4,
+   "pct_del_total_nacional": 3.7,
+   "provincias": {
+    "AREQUIPA": 111,
+    "AREQUIPA-CAYLLOMA": 5,
+    "ISLAY-AREQUIPA": 5,
+    "CASTILLA": 1
+   }
+  },
+  "AYACUCHO": {
+   "denuncias": 140,
+   "por_oferta_de_trabajo": 72,
+   "pct_oferta_de_trabajo": 51.4,
+   "ranking_nacional": 5,
+   "pct_del_total_nacional": 3.7,
+   "provincias": {
+    "HUAMANGA": 94,
+    "AYACUCHO": 32,
+    "HUAMANGA-HUANTA": 6
+   }
+  },
+  "PUNO": {
+   "denuncias": 136,
+   "por_oferta_de_trabajo": 113,
+   "pct_oferta_de_trabajo": 83.1,
+   "ranking_nacional": 6,
+   "pct_del_total_nacional": 3.6,
+   "provincias": {
+    "S ROMAN": 47,
+    "S RAMON": 36,
+    "M MELGAR-S ROMAN": 7,
+    "SAN ROMAN": 4,
+    "S ANTONIO DE PUTINA": 3,
+    "YUNGUYO": 2,
+    "S ANTONIO": 1,
+    "COLLAO": 1
+   }
+  },
+  "HUÁNUCO": {
+   "denuncias": 133,
+   "por_oferta_de_trabajo": 75,
+   "pct_oferta_de_trabajo": 56.4,
+   "ranking_nacional": 7,
+   "pct_del_total_nacional": 3.5,
+   "provincias": {
+    "HUANUCO": 35,
+    "LEONCIO PRADO": 11,
+    "HUANUCO- LEONCIO PRADO": 7,
+    "HUANUCO-PACHITEA": 6,
+    "HUANUCO-AMBO-HUAMALIES": 6,
+    "LEONCIO PRADO-HUANUCO": 6,
+    "AMBO": 6,
+    "PACHITEA-HUANUCO": 5,
+    "PTO INCA": 4,
+    "HUANUCO -LEONCIO PRADO": 3,
+    "L PRADO": 3,
+    "HUANUCO-L PRADO": 3,
+    "PUERTO INCA": 2,
+    "AMARILIS": 1,
+    "HUAMALIES": 1,
+    "PACHITEA": 1,
+    "PTO. INCA": 1
+   }
+  },
+  "LORETO": {
+   "denuncias": 126,
+   "por_oferta_de_trabajo": 79,
+   "pct_oferta_de_trabajo": 62.7,
+   "ranking_nacional": 8,
+   "pct_del_total_nacional": 3.3,
+   "provincias": {
+    "MAYNAS": 115,
+    "MAYNAS-PUTUMAYO": 4
+   }
+  },
+  "SAN MARTÍN": {
+   "denuncias": 102,
+   "por_oferta_de_trabajo": 80,
+   "pct_oferta_de_trabajo": 78.4,
+   "ranking_nacional": 9,
+   "pct_del_total_nacional": 2.7,
+   "provincias": {
+    "RIOJA": 7,
+    "MOYOBAMBA-LAMAS-PICOTA-S MARTIN-ALTO AMAZONAS": 7,
+    "SAN MARTIN-RIOJA-ALTO AMAZONAS": 6,
+    "MOYOBAMBA": 5,
+    "SAN MARTIN -MOYOBAMBA": 5,
+    "BELLAVISTA-RIOJA-TOCACHE-ALTO AMAZONAS": 4,
+    "TOCACHE": 4,
+    "PICOTA-RIOJA-ALTO AMAZONAS": 4,
+    "MOYOBAMBA-S MARTIN-TOCACHE-NARANJILLO": 4,
+    "MOYOBAMBA-RIOJA": 3,
+    "S MARTIN-RIOJA": 3,
+    "RIOJA-SAN MARTIN": 3,
+    "ALTO AMAZONAS-MOYOBAMBA": 3,
+    "ALTO AMAZONAS-S MARTIN": 3,
+    "ALTO AMAZONAS-EL DORADO-RIOJA": 3,
+    "M CACERES-RIOJA.TOCACHE": 3,
+    "TOCACHE-ALTO AMAZONAS": 2,
+    "EL DORADO-RIOJA": 2,
+    "ALTO AMAZONAS": 2,
+    "SAN MARTIN -TOCACHE": 2,
+    "SAN MARTIN -LAMAS": 2,
+    "HUALLAGA": 1,
+    "MCAL CACERES": 1,
+    "SAN MARTIN": 1
+   }
+  },
+  "MADRE DE DIOS": {
+   "denuncias": 92,
+   "por_oferta_de_trabajo": 84,
+   "pct_oferta_de_trabajo": 91.3,
+   "ranking_nacional": 10,
+   "pct_del_total_nacional": 2.4,
+   "provincias": {
+    "TAMBOPATA": 49,
+    "TAMBOPATA-MANU": 11,
+    "TAMBOPATA|": 5,
+    "TAMBOPATA-TAHUAMANU": 3,
+    "MANU": 2
+   }
+  },
+  "JUNÍN": {
+   "denuncias": 92,
+   "por_oferta_de_trabajo": 63,
+   "pct_oferta_de_trabajo": 68.5,
+   "ranking_nacional": 11,
+   "pct_del_total_nacional": 2.4,
+   "provincias": {
+    "HUANCAYO": 15,
+    "CHANCHAMAYO": 9,
+    "HUANCAYO-SATIPO": 8,
+    "SATIPO": 8,
+    "HUANCAYO-CHANCHAMAYO": 6,
+    "SATIPO-HUANCAYO": 6,
+    "OXAPAMPA": 5,
+    "YAULI-OXAPAMPA": 4,
+    "JUNIN-CHANCHAMAYO": 4,
+    "OXAPAMPA-SATIPO": 4,
+    "SATIPO-YAULI": 3,
+    "HYO-EL TAMBO": 3,
+    "HUANCAYO-YAULI-JUNIN": 3,
+    "CHANCHAMAYO-SATIPO": 2,
+    "CHANCHAMAYO-JUNIN": 2,
+    "YAULI-SATIPO": 2,
+    "JAULI": 1,
+    "JUNIN": 1,
+    "SATIPO-RIO NEGRO": 1
+   }
+  },
+  "TACNA": {
+   "denuncias": 85,
+   "por_oferta_de_trabajo": 28,
+   "pct_oferta_de_trabajo": 32.9,
+   "ranking_nacional": 12,
+   "pct_del_total_nacional": 2.2,
+   "provincias": {
+    "TACNA": 77
+   }
+  },
+  "CAJAMARCA": {
+   "denuncias": 81,
+   "por_oferta_de_trabajo": 23,
+   "pct_oferta_de_trabajo": 28.4,
+   "ranking_nacional": 13,
+   "pct_del_total_nacional": 2.1,
+   "provincias": {
+    "CAJAMARCA": 48,
+    "CAJAMARCA-CUTERVO": 7,
+    "CAJAMARCA-JAEN": 2,
+    "CUTERVO-CAJAMARCA": 2,
+    "S MARCOS-JAEN": 2,
+    "CUTERVO": 1,
+    "HUALGAYOC": 1,
+    "JAEN": 1
+   }
+  },
+  "TUMBES": {
+   "denuncias": 63,
+   "por_oferta_de_trabajo": 33,
+   "pct_oferta_de_trabajo": 52.4,
+   "ranking_nacional": 14,
+   "pct_del_total_nacional": 1.6,
+   "provincias": {
+    "TUMBES": 29,
+    "TUMBES-CONTRALMIRANTE VILLAR": 7,
+    "CNTE.VILLAR": 4,
+    "CONTRALMIRANTE VILLAR": 2,
+    "TUMBES -ZARUMILLA": 2,
+    "TUMBES-ZARUMILLA": 2,
+    "ZARUMILLA": 2
+   }
+  },
+  "PIURA": {
+   "denuncias": 61,
+   "por_oferta_de_trabajo": 33,
+   "pct_oferta_de_trabajo": 54.1,
+   "ranking_nacional": 15,
+   "pct_del_total_nacional": 1.6,
+   "provincias": {
+    "PIURA": 17,
+    "PIURA-SULLANA": 10,
+    "SULLANA": 8,
+    "PIURA-PAITA": 4,
+    "PIURA -SULLANA": 3,
+    "PAITA": 3,
+    "SECHURA": 3,
+    "MORROPON-PIURA": 2,
+    "AYABACA": 1,
+    "TALARA": 1
+   }
+  },
+  "LA LIBERTAD": {
+   "denuncias": 57,
+   "por_oferta_de_trabajo": 34,
+   "pct_oferta_de_trabajo": 59.6,
+   "ranking_nacional": 16,
+   "pct_del_total_nacional": 1.5,
+   "provincias": {
+    "TRUJILLO": 37,
+    "LA LIBERTAD": 6,
+    "TRUJILLO-PACASMAYO": 6,
+    "PATAZ": 3
+   }
+  },
+  "ÁNCASH": {
+   "denuncias": 31,
+   "por_oferta_de_trabajo": 22,
+   "pct_oferta_de_trabajo": 71.0,
+   "ranking_nacional": 17,
+   "pct_del_total_nacional": 0.8,
+   "provincias": {
+    "CHIMBOTE": 10,
+    "ANCASH": 6,
+    "SANTA-HUARAZ": 4,
+    "SANTA": 4,
+    "HUARAZ": 2,
+    "PALLASCA": 1
+   }
+  },
+  "PASCO": {
+   "denuncias": 30,
+   "por_oferta_de_trabajo": 21,
+   "pct_oferta_de_trabajo": 70.0,
+   "ranking_nacional": 18,
+   "pct_del_total_nacional": 0.8,
+   "provincias": {
+    "OXAPAMPA": 15,
+    "PASCO-PTO INCA": 7,
+    "PASCO": 4,
+    "OXAMPAMPA": 1,
+    "PUERTO INCA": 1
+   }
+  },
+  "UCAYALI": {
+   "denuncias": 29,
+   "por_oferta_de_trabajo": 15,
+   "pct_oferta_de_trabajo": 51.7,
+   "ranking_nacional": 19,
+   "pct_del_total_nacional": 0.8,
+   "provincias": {
+    "CRNL PORTILLO": 15,
+    "PADRE ABAD": 6,
+    "ATALAYA": 1,
+    "CRNL PORTILL": 1,
+    "CRNL.PORTILLO": 1
+   }
+  },
+  "CALLAO": {
+   "denuncias": 18,
+   "por_oferta_de_trabajo": 10,
+   "pct_oferta_de_trabajo": 55.6,
+   "ranking_nacional": 20,
+   "pct_del_total_nacional": 0.5,
+   "provincias": {
+    "CALLAO": 17
+   }
+  },
+  "APURÍMAC": {
+   "denuncias": 16,
+   "por_oferta_de_trabajo": 8,
+   "pct_oferta_de_trabajo": 50.0,
+   "ranking_nacional": 21,
+   "pct_del_total_nacional": 0.4,
+   "provincias": {
+    "ABANCAY": 7,
+    "ANDAHUAYLAS": 4,
+    "COTABAMBAS": 3,
+    "CHINCHEROS": 1,
+    "GRAU": 1
+   }
+  },
+  "ICA": {
+   "denuncias": 14,
+   "por_oferta_de_trabajo": 4,
+   "pct_oferta_de_trabajo": 28.6,
+   "ranking_nacional": 22,
+   "pct_del_total_nacional": 0.4,
+   "provincias": {
+    "PISCO": 3,
+    "ICA": 1,
+    "NAZCA": 1
+   }
+  },
+  "AMAZONAS": {
+   "denuncias": 13,
+   "por_oferta_de_trabajo": 9,
+   "pct_oferta_de_trabajo": 69.2,
+   "ranking_nacional": 23,
+   "pct_del_total_nacional": 0.3,
+   "provincias": {
+    "UTCUBAMBA": 5,
+    "BAGUA": 2,
+    "UTCUBAMBA-BAGUA": 2,
+    "UCTUBAMBA": 1
+   }
+  },
+  "MOQUEGUA": {
+   "denuncias": 9,
+   "por_oferta_de_trabajo": 6,
+   "pct_oferta_de_trabajo": 66.7,
+   "ranking_nacional": 24,
+   "pct_del_total_nacional": 0.2,
+   "provincias": {
+    "MCAL NIETO": 7,
+    "ILO": 1,
+    "MOQUEGUA": 1
+   }
+  },
+  "HUANCAVELICA": {
+   "denuncias": 4,
+   "por_oferta_de_trabajo": 1,
+   "pct_oferta_de_trabajo": 25.0,
+   "ranking_nacional": 25,
+   "pct_del_total_nacional": 0.1,
+   "provincias": {
+    "HUANCAVELICA": 3,
+    "TAYACAJA": 1
+   }
+  }
+ }
+}

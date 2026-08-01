@@ -20,6 +20,7 @@ body {
 
 button, textarea, input { font: inherit; }
 button { -webkit-tap-highlight-color: transparent; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
 
 .app-shell {
   width: min(100%, 560px);
@@ -73,6 +74,21 @@ h1 { margin-bottom: 2px; font-size: clamp(1.75rem, 8vw, 2.35rem); line-height: 1
 }
 
 .panel { padding: 16px; }
+
+.dato-nacional {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 12px;
+  margin-bottom: 15px;
+  padding: 14px 16px;
+  border: 1px solid #bed9cf;
+  border-radius: 16px;
+  color: #29483e;
+  background: #e9f6f1;
+}
+.dato-nacional strong { grid-row: 1 / 3; align-self: center; color: #08765b; font-size: 1.65rem; }
+.dato-nacional p { margin: 0; font-size: 0.8rem; line-height: 1.4; }
+.dato-nacional small { color: #60746d; font-size: 0.66rem; line-height: 1.35; }
 
 .modo-selector {
   display: grid;
@@ -236,6 +252,13 @@ button:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
 .semaforo__icono--alto svg circle { fill: #fff; }
 
 .escala { margin-top: 19px; }
+.escala__cabecera { display: flex; justify-content: space-between; margin-bottom: 7px; color: #52635d; font-size: 0.72rem; }
+.escala__cabecera strong { color: #17231f; }
+.barra-puntaje { overflow: hidden; height: 8px; border-radius: 20px; background: rgba(78, 93, 88, 0.15); }
+.barra-puntaje span { display: block; height: 100%; min-width: 2px; border-radius: inherit; transition: width 280ms ease; }
+.escala--bajo .barra-puntaje span { background: #16865f; }
+.escala--medio .barra-puntaje span { background: #e7ae11; }
+.escala--alto .barra-puntaje span { background: #ce3e31; }
 .escala__barras { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
 .escala__barra { height: 7px; border-radius: 20px; background: rgba(78, 93, 88, 0.15); }
 .escala--bajo .escala__barra.activa { background: #16865f; }
@@ -253,6 +276,11 @@ button:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
 .banderas--alto li { border-left-color: #ce3e31; }
 .banderas p { margin-bottom: 7px; font-size: 0.9rem; line-height: 1.5; }
 .bandera__tipo { color: #116749; font-weight: 800; }
+.bandera__metadatos { display: flex; flex-wrap: wrap; gap: 6px; }
+.bandera__metadatos span { padding: 3px 7px; border-radius: 20px; color: #52635d; background: #e8eeeb; font-size: 0.64rem; font-weight: 750; text-transform: uppercase; }
+.bandera__metadatos .origen { text-transform: none; }
+.bandera__metadatos .origen--regla { color: #075e49; background: #d8eee6; }
+.bandera__metadatos .origen--modelo { color: #465766; background: #e3eaf0; }
 blockquote { margin: 10px 0 0; color: #4c4a3e; font-size: 0.85rem; font-style: italic; line-height: 1.5; }
 mark { padding: 2px 5px; color: #174c3b; background: #d9f1e6; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
 .banderas--medio .bandera__tipo { color: #704c00; }
@@ -262,6 +290,17 @@ mark { padding: 2px 5px; color: #174c3b; background: #d9f1e6; box-decoration-bre
 .banderas--alto blockquote { color: #7b3029; }
 .banderas--alto mark { color: #771f18; background: #ffd4cf; }
 .sin-banderas, .explicacion p { margin-bottom: 0; color: #43534e; font-size: 0.9rem; line-height: 1.65; }
+
+.recomendacion p, .transcripcion p, .contexto-local li { margin-bottom: 0; color: #43534e; font-size: 0.9rem; line-height: 1.6; }
+.recomendacion--alto { border-left: 5px solid #ce3e31; background: #fff7f5; }
+.contexto-local ul { display: grid; gap: 8px; margin: 0; padding-left: 19px; }
+.transcripcion p { max-height: 190px; overflow: auto; padding: 12px; border-radius: 9px; background: #f3f6f5; white-space: pre-wrap; }
+.boton-secundario { margin-top: 12px; padding: 9px 12px; border: 1px solid #08765b; border-radius: 9px; color: #08765b; background: #fff; font-size: 0.78rem; font-weight: 750; cursor: pointer; }
+.aviso-formato { display: flex; flex-direction: column; gap: 4px; padding: 15px 20px; color: #704c00; background: #fff8df; font-size: 0.8rem; }
+.aviso-formato details { margin-top: 7px; }
+.aviso-formato pre { overflow: auto; max-height: 180px; padding: 10px; background: #fff; white-space: pre-wrap; }
+.resultado-sin-aviso h2 { font-size: 1.25rem; }
+.resultado-sin-aviso p { color: #52635d; line-height: 1.6; }
 
 .disclaimer { margin: 0; padding: 17px 20px; color: #697773; background: #f8faf9; font-size: 0.72rem; line-height: 1.55; }
 

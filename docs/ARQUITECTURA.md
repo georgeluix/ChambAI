@@ -1,145 +1,51 @@
-# Arquitectura de ChambAI
+# Arquitectura
 
-## Objetivo
-
-Recibir el texto de un aviso laboral, analizarlo en el mismo equipo y devolver señales comprensibles de posible captación fraudulenta. La aplicación no califica jurídicamente una conducta ni acusa a una persona o empresa.
-
-## Principios del proyecto
-
-1. **Privacidad local:** los avisos no salen del equipo.
-2. **Explicabilidad:** cada alerta incluye tipo, descripción y fragmento del aviso.
-3. **Lenguaje responsable:** se comunica riesgo, no culpabilidad.
-4. **Simplicidad:** se prioriza una demo estable dentro de un hackathon de cinco horas.
-5. **Accesibilidad:** alto contraste, letras legibles y diseño adaptable a celular.
-
-## Componentes
+## Flujo LangGraph
 
 ```text
 Usuario
-  │
-  ▼
-React + Vite (:5173)
-  │ POST /analyze o /analyze-image
-  ▼
+  |
+  v
+React/Vite (:5173)
+  |
+  v
 FastAPI (:8000)
-  │
-  ▼
-LangGraph
-  │
-  ▼
-Ollama local + Gemma 4 E2B
+  |
+  v
+extraer -> reglas -> analizar -> contextualizar -> consolidar
+  |          |          |             |                |
+  |          |          |             |                `-> JSON final
+  |          |          |             `-> datos PNP locales
+  |          |          `-> Gemma texto, few-shot
+  |          `-> reglas legales deterministas
+  `-> Gemma vision, solo cuando la entrada es imagen
 ```
 
-No debe haber APIs, fuentes, tipografías, telemetría ni otros recursos remotos necesarios durante la ejecución.
+## Division de responsabilidades
 
-## Frontend
+- Gemma vision transcribe literalmente; no interpreta la imagen.
+- Gemma texto clasifica con un catalogo cerrado y devuelve texto plano.
+- Python fuerza las reglas que no pueden depender del modelo.
+- `datos/datos_trata.py` aporta cifras agregadas verificables.
+- El consolidado deduplica banderas, calcula puntaje y prioriza reglas.
+- React diferencia visualmente `origen=modelo` y `origen=regla`.
 
-Ubicación actual: `src/`.
+## Ollama
 
-Responsabilidades:
+FastAPI usa `POST /api/chat`. `think:false` evita que Gemma 4 entregue el
+contenido util en el canal de razonamiento, y cada llamada fija explícitamente
+`num_ctx=16384`. Las inferencias se serializan para proteger la VRAM.
 
-- Capturar el aviso laboral.
-- Tomar o elegir una foto y enviarla al backend local.
-- Enviar `{ "texto": "..." }` al endpoint local.
-- Mostrar carga, error o resultado.
-- Representar el nivel de riesgo mediante color y texto.
-- Mostrar las banderas y sus fragmentos.
-- Presentar explicación y disclaimer.
+En el entorno de demo Ollama corre en Windows y FastAPI en WSL, por eso uvicorn
+se inicia con `OLLAMA_URL=http://172.26.176.1:11434`.
 
-El color nunca debe ser el único medio para comunicar el riesgo.
+Una solicitud de texto hace una llamada a Gemma. Una imagen hace dos llamadas
+secuenciales: vision y luego clasificacion del texto transcrito.
 
-### Flujo de fotografías
+## Seguridad
 
-```text
-cámara o galería → previsualización → POST /analyze-image → OCR y análisis en backend
-```
-
-No se aceptan URL de imágenes. La fotografía se envía como `multipart/form-data` en un campo llamado `imagen`. El backend devuelve el mismo esquema de resultado que el análisis de texto.
-
-## Backend
-
-Tecnología fijada: FastAPI.
-
-Responsabilidades previstas:
-
-- Validar que `texto` no esté vacío.
-- Validar la imagen y ejecutar OCR local para `POST /analyze-image`.
-- Ejecutar el grafo de análisis.
-- Normalizar y validar la salida del modelo.
-- Devolver siempre el contrato acordado.
-- Permitir CORS únicamente para los orígenes locales necesarios durante el desarrollo.
-- Entregar errores controlados sin exponer trazas internas.
-
-Endpoint acordado: `POST /analyze`.
-
-## Orquestación
-
-Tecnología fijada: LangGraph.
-
-Para el MVP conviene un flujo corto:
-
-```text
-validar entrada → analizar aviso → validar/normalizar JSON → responder
-```
-
-Solo se deben añadir nodos adicionales si aportan estabilidad demostrable. El flujo debe poder probarse con ejemplos deterministas sin conexión a internet.
-
-## Modelo local y Ollama
-
-Modelo fijado por el equipo: Gemma 4 E2B ejecutado localmente mediante Ollama.
-
-Regla obligatoria para toda conexión o invocación:
-
-```python
-num_ctx = 16384
-```
-
-Esta opción no debe depender del valor predeterminado de Ollama. Debe aparecer explícitamente en la configuración de cada cliente o invocación.
-
-Antes de cerrar la integración, se debe confirmar el identificador exacto del modelo instalado mediante `ollama list`, porque el nombre usado por Ollama debe coincidir literalmente.
-
-## Contrato de datos
-
-Entrada:
-
-```json
-{ "texto": "..." }
-```
-
-Salida:
-
-```json
-{
-  "riesgo": "bajo | medio | alto",
-  "banderas": [
-    {
-      "tipo": "string",
-      "descripcion": "string",
-      "fragmento": "string"
-    }
-  ],
-  "explicacion": "string",
-  "disclaimer": "string"
-}
-```
-
-Los nombres de campos forman parte del contrato y no deben traducirse ni modificarse. El backend debe validar la salida estructurada antes de enviarla al frontend.
-
-## Seguridad y comunicación responsable
-
-- No afirmar que una oferta es un delito como conclusión automática.
-- No presentar al modelo como una autoridad.
-- No inventar teléfonos, entidades, estadísticas ni rutas de denuncia.
-- Verificar cualquier información institucional antes de incorporarla a la interfaz final.
-- Evitar registrar el texto completo de los avisos en producción o durante la demo.
-- No cargar fotos ni ejecutar OCR mediante servicios externos.
-- Mantener visible el disclaimer en cada resultado.
-
-## Decisiones pendientes
-
-- Confirmar el identificador exacto del modelo disponible en Ollama.
-- Definir el esquema Pydantic del backend.
-- Definir el prompt de análisis y ejemplos de prueba.
-- Decidir si el MVP usará una sola llamada al modelo o validación/reintento local.
-- Verificar fuentes institucionales y canales de ayuda que se mostrarán.
-- Definir la estrategia de distribución móvil. El stack Ollama/FastAPI requiere un equipo servidor local y no convierte por sí solo el teléfono en un dispositivo autónomo.
+- JPG, PNG y WEBP hasta 10 MB; se valida la firma real del archivo.
+- Sin logs de texto, imagenes ni telefonos.
+- CORS limitado a los origenes configurados.
+- Reintento unico ante formato invalido.
+- Etiquetas fuera del catalogo no suman puntaje ni llegan a la interfaz.

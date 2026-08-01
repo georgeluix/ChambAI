@@ -1,5 +1,12 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.env
+.runtime/
+
 node_modules/
 dist/
-.vite/
-*.local
-vite.*.log
+.env.local
+.env.*.local
+npm-debug.log*
