@@ -6,6 +6,7 @@ from __future__ import annotations
 import asyncio
 import base64
 import os
+import re
 from typing import Any
 
 import httpx
@@ -20,6 +21,7 @@ from extractor import (
 
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434").rstrip("/")
 MODELO_BASE = os.getenv("CHAMBA_MODELO_BASE", "gemma4:e2b")
+MODELO_VISION = os.getenv("CHAMBA_MODELO_VISION", "gemma3:4b")
 MODO_ANALISIS = os.getenv("CHAMBA_MODO_ANALISIS", "base").strip().lower()
 if MODO_ANALISIS not in {"base", "lora"}:
     raise RuntimeError("CHAMBA_MODO_ANALISIS debe ser 'base' o 'lora'.")
@@ -35,20 +37,31 @@ KEEP_ALIVE = os.getenv("CHAMBA_KEEP_ALIVE", "10m")
 _TURNO_INFERENCIA = asyncio.Semaphore(1)
 
 PROMPT_EXTRACCION = (
-    "Realiza OCR de la imagen y transcribe TODO el texto visible. No decidas si "
-    "es un aviso de trabajo: solo lee. Incluye letras pequenas del encabezado, "
-    "centro y pie, aunque haya personas, logotipos, decoracion o poco contraste. "
-    "Conserva palabras, numeros y saltos de linea. No interpretes, no resumas y "
-    "no describas la imagen. Si existe cualquier texto legible, transcribelo. "
-    "Responde solo SIN_TEXTO cuando no haya absolutamente ningun texto legible."
+    "Observa la imagen completa y responde sin markdown con dos bloques. En "
+    "TEXTO_VISIBLE transcribe literalmente TODO el texto: encabezado, centro, "
+    "pie, palabras y numeros. En CONTEXTO_VISUAL describe brevemente solo los "
+    "elementos visibles relevantes para entender el aviso, como tipo de local, "
+    "personas, vestimenta, bebidas o ambiente. No identifiques personas, no "
+    "supongas edades, delitos ni nivel de riesgo. Usa exactamente este formato:\n"
+    "TEXTO_VISIBLE:\n<transcripcion o SIN_TEXTO>\n"
+    "CONTEXTO_VISUAL:\n<descripcion objetiva o SIN_CONTEXTO>"
 )
 
 PROMPT_EXTRACCION_REINTENTO = (
-    "Observa nuevamente la imagen con maxima atencion y actua solo como OCR. "
-    "Ignora fotografias, fondos brillantes y adornos. Busca letras pequenas en "
-    "la parte superior, central e inferior. Transcribe literalmente todas las "
-    "palabras y numeros que puedas leer, sin decidir de que trata la imagen ni "
-    "agregar comentarios. Solo si no hay ninguna letra legible responde SIN_TEXTO."
+    "Revisa nuevamente toda la imagen, incluida la tipografia pequena sobre "
+    "fondos brillantes. Responde sin markdown con TEXTO_VISIBLE y "
+    "CONTEXTO_VISUAL. Transcribe literalmente las palabras y numeros; despues "
+    "describe de forma objetiva el lugar, personas, vestimenta, bebidas y "
+    "ambiente visibles. No supongas edades, delitos ni nivel de riesgo. Formato:\n"
+    "TEXTO_VISIBLE:\n<transcripcion o SIN_TEXTO>\n"
+    "CONTEXTO_VISUAL:\n<descripcion objetiva o SIN_CONTEXTO>"
+)
+
+_MARCA_CONTEXTO_VISUAL = re.compile(
+    r"(?im)^\s*(?:\*\*)?CONTEXTO_VISUAL(?:\*\*)?\s*:\s*"
+)
+_ENCABEZADO_TEXTO = re.compile(
+    r"(?is)^\s*(?:\*\*)?TEXTO(?:_VISIBLE)?(?:\*\*)?\s*:\s*"
 )
 
 
@@ -185,38 +198,73 @@ async def _generar(
     return contenido.strip()
 
 
-async def transcribir_imagen(imagen: bytes) -> str:
+def _parsear_extraccion_visual(salida: str) -> dict[str, str]:
+    """Separa OCR y contexto aunque Gemma agregue negritas accidentales."""
+    partes = _MARCA_CONTEXTO_VISUAL.split(salida.strip(), maxsplit=1)
+    texto = _ENCABEZADO_TEXTO.sub("", partes[0]).strip(" \r\n*")
+    contexto = partes[1].strip(" \r\n*") if len(partes) == 2 else ""
+    if not texto:
+        texto = "SIN_TEXTO"
+    if contexto.upper() == "SIN_CONTEXTO":
+        contexto = ""
+    return {"texto": texto, "contexto_visual": contexto}
+
+
+def _parece_aviso(extraccion: dict[str, str]) -> bool:
+    return es_aviso_laboral(extraccion["texto"]) or es_aviso_laboral(
+        extraccion["contexto_visual"]
+    )
+
+
+async def extraer_imagen(imagen: bytes) -> dict[str, str]:
     primera = await _generar(
-        MODELO_BASE,
+        MODELO_VISION,
         PROMPT_EXTRACCION,
         temperature=0,
         imagen=imagen,
         num_predict=MAX_PREDICCION_EXTRACCION,
     )
-    if es_aviso_laboral(primera):
-        return primera
+    extraccion_primera = _parsear_extraccion_visual(primera)
+    if _parece_aviso(extraccion_primera):
+        return extraccion_primera
 
     # Una segunda mirada recupera afiches con tipografia pequena o fondos
     # decorativos. Solo ocurre cuando la primera transcripcion no contiene
     # suficientes señales laborales.
     segunda = await _generar(
-        MODELO_BASE,
+        MODELO_VISION,
         PROMPT_EXTRACCION_REINTENTO,
         temperature=0,
         imagen=imagen,
         num_predict=MAX_PREDICCION_EXTRACCION,
     )
-    if segunda.strip().upper() not in {"SIN_TEXTO", "SIN_AVISO"}:
-        return segunda
-    return primera
+    extraccion_segunda = _parsear_extraccion_visual(segunda)
+    if _parece_aviso(extraccion_segunda):
+        return extraccion_segunda
+    if len(extraccion_segunda["texto"]) > len(extraccion_primera["texto"]):
+        return extraccion_segunda
+    return extraccion_primera
 
 
-async def analizar_aviso(texto: str, temperature: float = 0) -> str:
+async def transcribir_imagen(imagen: bytes) -> str:
+    """Compatibilidad para consumidores que solo necesitan el texto OCR."""
+    return (await extraer_imagen(imagen))["texto"]
+
+
+async def analizar_aviso(
+    texto: str, temperature: float = 0, contexto_visual: str = ""
+) -> str:
+    entrada = texto
+    if contexto_visual:
+        entrada = (
+            f"{texto}\n\nCONTEXTO VISUAL OBSERVABLE (no es una conclusion de "
+            f"riesgo):\n{contexto_visual}"
+        )
     if ADAPTADOR_ACTIVO:
         # Es exactamente el prompt usado al entrenar y verificar el LoRA.
-        prompt = f"Analiza este aviso de empleo:\n\n{texto}"
+        prompt = f"Analiza este aviso de empleo:\n\n{entrada}"
     else:
-        prompt = PROMPT_ANALISIS.format(catalogo=_catalogo(), aviso=texto)
+        prompt = PROMPT_ANALISIS.format(catalogo=_catalogo(), aviso=entrada)
     return await _generar(
         MODELO_ANALISIS,
         prompt,
@@ -236,6 +284,7 @@ async def estado_ollama() -> dict[str, Any]:
         return {
             "ok": False,
             "modelo": MODELO_ANALISIS,
+            "modelo_vision": MODELO_VISION,
             "ollama": False,
             "adaptador": ADAPTADOR_ACTIVO,
         }
@@ -245,14 +294,14 @@ async def estado_ollama() -> dict[str, Any]:
         for modelo in modelos
         if isinstance(modelo, dict)
     }
-    requeridos = {MODELO_BASE, MODELO_ANALISIS}
+    requeridos = {MODELO_VISION, MODELO_ANALISIS}
     disponibles = requeridos.issubset(nombres)
     vision = False
     if disponibles:
         try:
             async with httpx.AsyncClient(timeout=5.0) as cliente:
                 detalle = await cliente.post(
-                    f"{OLLAMA_URL}/api/show", json={"model": MODELO_BASE}
+                    f"{OLLAMA_URL}/api/show", json={"model": MODELO_VISION}
                 )
                 detalle.raise_for_status()
                 vision = "vision" in detalle.json().get("capabilities", [])
@@ -261,6 +310,7 @@ async def estado_ollama() -> dict[str, Any]:
     return {
         "ok": disponibles and vision,
         "modelo": MODELO_ANALISIS,
+        "modelo_vision": MODELO_VISION,
         "ollama": True,
         "adaptador": ADAPTADOR_ACTIVO,
     }
@@ -272,4 +322,7 @@ if __name__ == "__main__":
     if not estado["ollama"]:
         print("Inicia Ollama con: ollama serve")
     elif not estado["ok"]:
-        print(f"Verifica los modelos base={MODELO_BASE} y analisis={MODELO_ANALISIS}")
+        print(
+            f"Verifica los modelos vision={MODELO_VISION} "
+            f"y analisis={MODELO_ANALISIS}"
+        )

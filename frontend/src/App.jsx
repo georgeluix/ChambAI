@@ -109,6 +109,12 @@ function Resultados({ resultado, desdeFoto, onEditarTranscripcion }) {
           <h2>No encontramos un aviso de trabajo</h2>
           <p>{resultado.explicacion}</p>
           <p className="recomendacion">{resultado.recomendacion}</p>
+          {desdeFoto && resultado.contexto_visual && (
+            <div className="contexto-visual contexto-visual--interno">
+              <strong>Lo que Gemma observó</strong>
+              <p>{resultado.contexto_visual}</p>
+            </div>
+          )}
         </div>
       </section>
     );
@@ -167,6 +173,14 @@ function Resultados({ resultado, desdeFoto, onEditarTranscripcion }) {
           {resultado.contexto_local.fuente && (
             <small>Fuente: {resultado.contexto_local.fuente}</small>
           )}
+        </div>
+      )}
+
+      {desdeFoto && resultado.contexto_visual && (
+        <div className="bloque contexto-visual">
+          <h3>Contexto visual observado</h3>
+          <p>{resultado.contexto_visual}</p>
+          <small>Descripción de Gemma basada en la foto; no es una conclusión legal.</small>
         </div>
       )}
 

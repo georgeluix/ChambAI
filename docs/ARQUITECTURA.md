@@ -23,8 +23,8 @@ extraer -> reglas -> analizar -> contextualizar -> consolidar
 
 ## Division de responsabilidades
 
-- Gemma vision transcribe literalmente; no interpreta la imagen.
-- Gemma texto clasifica con un catalogo cerrado y devuelve texto plano.
+- Gemma 3 vision transcribe y describe elementos visuales observables.
+- Gemma 4 texto recibe la transcripcion y ese contexto, y clasifica con el catalogo.
 - Python fuerza las reglas que no pueden depender del modelo.
 - `datos/datos_trata.py` aporta cifras agregadas verificables.
 - El consolidado deduplica banderas, calcula puntaje y prioriza reglas.
@@ -39,8 +39,8 @@ contenido util en el canal de razonamiento, y cada llamada fija explícitamente
 En el entorno de demo Ollama corre en Windows y FastAPI en WSL, por eso uvicorn
 se inicia con `OLLAMA_URL=http://172.26.176.1:11434`.
 
-Una solicitud de texto hace una llamada a Gemma. Una imagen hace dos llamadas
-secuenciales: vision y luego clasificacion del texto transcrito.
+Una solicitud de texto hace una llamada a Gemma 4. Una imagen hace dos llamadas
+secuenciales: Gemma 3 vision y luego Gemma 4 para clasificar texto y contexto.
 
 ## Seguridad
 

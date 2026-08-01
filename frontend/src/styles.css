@@ -291,9 +291,13 @@ mark { padding: 2px 5px; color: #174c3b; background: #d9f1e6; box-decoration-bre
 .banderas--alto mark { color: #771f18; background: #ffd4cf; }
 .sin-banderas, .explicacion p { margin-bottom: 0; color: #43534e; font-size: 0.9rem; line-height: 1.65; }
 
-.recomendacion p, .transcripcion p, .contexto-local li { margin-bottom: 0; color: #43534e; font-size: 0.9rem; line-height: 1.6; }
+.recomendacion p, .transcripcion p, .contexto-local li, .contexto-visual p { margin-bottom: 0; color: #43534e; font-size: 0.9rem; line-height: 1.6; }
 .recomendacion--alto { border-left: 5px solid #ce3e31; background: #fff7f5; }
 .contexto-local ul { display: grid; gap: 8px; margin: 0; padding-left: 19px; }
+.contexto-visual { background: #f7f3ff; }
+.contexto-visual small { display: block; margin-top: 9px; color: #6d6478; line-height: 1.45; }
+.contexto-visual--interno { margin-top: 16px; padding: 13px; border-radius: 10px; }
+.contexto-visual--interno strong { display: block; margin-bottom: 5px; color: #514760; font-size: 0.82rem; }
 .transcripcion p { max-height: 190px; overflow: auto; padding: 12px; border-radius: 9px; background: #f3f6f5; white-space: pre-wrap; }
 .boton-secundario { margin-top: 12px; padding: 9px 12px; border: 1px solid #08765b; border-radius: 9px; color: #08765b; background: #fff; font-size: 0.78rem; font-weight: 750; cursor: pointer; }
 .aviso-formato { display: flex; flex-direction: column; gap: 4px; padding: 15px 20px; color: #704c00; background: #fff8df; font-size: 0.8rem; }

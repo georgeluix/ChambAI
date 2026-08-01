@@ -31,7 +31,9 @@ class GrafoTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_imagen_sin_aviso(self):
         with patch.object(
-            grafo, "transcribir_imagen", AsyncMock(return_value="SIN_TEXTO")
+            grafo,
+            "extraer_imagen",
+            AsyncMock(return_value={"texto": "SIN_TEXTO", "contexto_visual": ""}),
         ):
             resultado = await grafo.ejecutar_imagen(b"imagen-simulada")
         self.assertFalse(resultado["aviso_detectado"])
@@ -47,12 +49,22 @@ class GrafoTest(unittest.IsolatedAsyncioTestCase):
             "EXPLICACION: Conviene verificar la identidad del empleador."
         )
         with (
-            patch.object(grafo, "transcribir_imagen", AsyncMock(return_value=transcripcion)),
+            patch.object(
+                grafo,
+                "extraer_imagen",
+                AsyncMock(
+                    return_value={
+                        "texto": transcripcion,
+                        "contexto_visual": "Club nocturno con bebidas.",
+                    }
+                ),
+            ),
             patch.object(grafo, "analizar_aviso", AsyncMock(return_value=salida)),
         ):
             resultado = await grafo.ejecutar_imagen(b"imagen-simulada")
         self.assertTrue(resultado["aviso_detectado"])
         self.assertEqual(resultado["texto_analizado"], transcripcion)
+        self.assertEqual(resultado["contexto_visual"], "Club nocturno con bebidas.")
         self.assertEqual(resultado["riesgo"], "medio")
 
     async def test_canoniza_bandera_del_corpus(self):

@@ -66,6 +66,26 @@ class ModeloOllamaTest(unittest.TestCase):
         self.assertIn("ANFITRIONAS", salida)
         self.assertEqual(generar.await_count, 2)
 
+    def test_separa_texto_y_contexto_visual(self):
+        salida = (
+            "**TEXTO_VISIBLE:**\nLUXURY CLUB\nANFITRIONAS\n\n"
+            "**CONTEXTO_VISUAL:** Club nocturno con bebidas y dos mujeres."
+        )
+        extraccion = modelo._parsear_extraccion_visual(salida)
+        self.assertIn("ANFITRIONAS", extraccion["texto"])
+        self.assertIn("Club nocturno", extraccion["contexto_visual"])
+
+    def test_vision_usa_modelo_separado(self):
+        generar = AsyncMock(
+            return_value=(
+                "TEXTO_VISIBLE:\nBuscamos personal\n"
+                "CONTEXTO_VISUAL:\nAviso sobre un local."
+            )
+        )
+        with patch.object(modelo, "_generar", generar):
+            asyncio.run(modelo.extraer_imagen(b"imagen"))
+        self.assertEqual(generar.await_args.args[0], modelo.MODELO_VISION)
+
     def test_no_reintenta_ocr_cuando_ya_detecta_oferta(self):
         generar = AsyncMock(return_value="Estamos en busca de personal. Buen sueldo.")
         with patch.object(modelo, "_generar", generar):

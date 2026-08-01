@@ -44,6 +44,7 @@ JSON estandar sin comentarios.
     "fuente": "PNP - MININTER, Datos Abiertos del Estado Peruano"
   },
   "texto_analizado": "...",     // texto original o transcripcion editable
+  "contexto_visual": "...",     // solo imagen: descripcion objetiva de Gemma vision
   "aviso_detectado": true,       // false si la foto no contiene un aviso
   "formato_valido": true,        // false si Gemma fallo tras el reintento
   "tiempo_ms": 1700,

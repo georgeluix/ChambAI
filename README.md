@@ -13,17 +13,18 @@ frontend/   React + Vite
 docs/       arquitectura, contrato de API y estado
 ```
 
-El entrenamiento se mantiene fuera de este commit mientras el proceso esta
-activo. La aplicacion funciona con `gemma4:e2b` base y few-shot.
+El entrenamiento se mantiene separado de la aplicacion. La app usa `gemma3:4b`
+para vision y `gemma4:e2b` para el analisis few-shot. El LoRA se conecta solo
+en la etapa de analisis textual.
 
 ## Como funciona
 
 Gemma trabaja una vez para texto y dos veces para una imagen:
 
 ```text
-Frontend -> FastAPI -> LangGraph -> Ollama (Gemma 4 E2B local)
+Frontend -> FastAPI -> LangGraph -> Ollama (Gemma 3 vision + Gemma 4 texto)
 
-1. extraer         imagen -> Gemma vision transcribe literalmente
+1. extraer         imagen -> Gemma 3 transcribe y describe contexto observable
 2. reglas          codigo: menores/cobros fuerzan riesgo alto
 3. analizar        texto -> Gemma few-shot -> texto plano estructurado
 4. contextualizar  datos_trata.py -> estadistica real del departamento

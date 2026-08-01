@@ -20,13 +20,14 @@ from extractor import (
     normalizar,
     parsear_salida_modelo,
 )
-from modelo import OllamaNoDisponible, analizar_aviso, transcribir_imagen
+from modelo import OllamaNoDisponible, analizar_aviso, extraer_imagen
 
 
 class EstadoAnalisis(TypedDict, total=False):
     texto: str
     origen: Literal["texto", "imagen"]
     imagen: bytes
+    contexto_visual: str
     aviso_detectado: bool
     banderas_reglas: list[dict[str, str]]
     riesgo_forzado: str | None
@@ -42,9 +43,15 @@ async def extraer(estado: EstadoAnalisis) -> dict[str, Any]:
     if estado["origen"] == "texto":
         return {"texto": estado["texto"], "aviso_detectado": True}
 
-    transcripcion = await transcribir_imagen(estado["imagen"])
-    detectado = es_aviso_laboral(transcripcion)
-    return {"texto": transcripcion, "aviso_detectado": detectado}
+    extraccion = await extraer_imagen(estado["imagen"])
+    transcripcion = extraccion["texto"]
+    contexto_visual = extraccion["contexto_visual"]
+    detectado = es_aviso_laboral(transcripcion) or es_aviso_laboral(contexto_visual)
+    return {
+        "texto": transcripcion,
+        "contexto_visual": contexto_visual,
+        "aviso_detectado": detectado,
+    }
 
 
 def reglas(estado: EstadoAnalisis) -> dict[str, Any]:
@@ -69,10 +76,16 @@ async def analizar(estado: EstadoAnalisis) -> dict[str, Any]:
             "analisis_modelo": {"formato_valido": True},
         }
 
-    salida = await analizar_aviso(estado["texto"], temperature=0)
+    salida = await analizar_aviso(
+        estado["texto"], temperature=0, contexto_visual=estado.get("contexto_visual", "")
+    )
     analisis = parsear_salida_modelo(salida)
     if not _analisis_semanticamente_valido(analisis):
-        salida = await analizar_aviso(estado["texto"], temperature=0)
+        salida = await analizar_aviso(
+            estado["texto"],
+            temperature=0,
+            contexto_visual=estado.get("contexto_visual", ""),
+        )
         analisis = parsear_salida_modelo(salida)
     if not _analisis_semanticamente_valido(analisis):
         analisis["formato_valido"] = False
@@ -164,6 +177,8 @@ def consolidar(estado: EstadoAnalisis) -> dict[str, Any]:
             "formato_valido": True,
             "tiempo_ms": tiempo_ms,
         }
+        if estado["origen"] == "imagen":
+            resultado["contexto_visual"] = estado.get("contexto_visual", "")
         return {"resultado": resultado}
 
     # Se vuelven a ejecutar las reglas para que el resultado final no pueda
@@ -218,6 +233,8 @@ def consolidar(estado: EstadoAnalisis) -> dict[str, Any]:
         "formato_valido": bool(analisis.get("formato_valido")),
         "tiempo_ms": tiempo_ms,
     }
+    if estado["origen"] == "imagen":
+        resultado["contexto_visual"] = estado.get("contexto_visual", "")
     if not analisis.get("formato_valido"):
         resultado["texto_crudo"] = estado["salida_modelo"]
     return {"resultado": resultado}
