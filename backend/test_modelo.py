@@ -33,6 +33,35 @@ class _ClienteFalso:
         )
 
 
+class _ClienteGeminiFalso:
+    ultima_url = None
+    ultimos_headers = None
+    ultimo_json = None
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *args):
+        return False
+
+    async def post(self, url, headers, json):
+        type(self).ultima_url = url
+        type(self).ultimos_headers = headers
+        type(self).ultimo_json = json
+        return httpx.Response(
+            200,
+            json={
+                "candidates": [
+                    {"content": {"parts": [{"text": "respuesta hospedada"}]}}
+                ]
+            },
+            request=httpx.Request("POST", url),
+        )
+
+
 class ModeloOllamaTest(unittest.TestCase):
     def test_chat_sin_thinking_y_con_contexto_completo(self):
         with patch.object(modelo.httpx, "AsyncClient", _ClienteFalso):
@@ -53,6 +82,36 @@ class ModeloOllamaTest(unittest.TestCase):
         self.assertEqual(cuerpo["messages"][0]["role"], "user")
         self.assertIn("images", cuerpo["messages"][0])
         self.assertNotIn("prompt", cuerpo)
+
+    def test_gemini_api_envia_imagen_y_desactiva_thinking_extenso(self):
+        png = b"\x89PNG\r\n\x1a\ncontenido"
+        with (
+            patch.object(modelo, "PROVEEDOR", "gemini_api"),
+            patch.object(modelo, "GEMINI_API_KEY", "clave-de-prueba"),
+            patch.object(modelo.httpx, "AsyncClient", _ClienteGeminiFalso),
+        ):
+            salida = asyncio.run(
+                modelo._generar(
+                    "gemma-4-26b-a4b-it",
+                    "Lee el aviso",
+                    imagen=png,
+                    num_predict=64,
+                )
+            )
+
+        self.assertEqual(salida, "respuesta hospedada")
+        self.assertIn("gemma-4-26b-a4b-it:generateContent", _ClienteGeminiFalso.ultima_url)
+        self.assertEqual(
+            _ClienteGeminiFalso.ultimos_headers["X-Goog-Api-Key"],
+            "clave-de-prueba",
+        )
+        cuerpo = _ClienteGeminiFalso.ultimo_json
+        parte_imagen = cuerpo["contents"][0]["parts"][0]["inlineData"]
+        self.assertEqual(parte_imagen["mimeType"], "image/png")
+        self.assertEqual(
+            cuerpo["generationConfig"]["thinkingConfig"]["thinkingLevel"],
+            "minimal",
+        )
 
     def test_reintenta_ocr_si_la_primera_lectura_no_parece_aviso(self):
         generar = AsyncMock(

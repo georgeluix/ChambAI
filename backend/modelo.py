@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Cliente minimo para Gemma 4 servido localmente por Ollama."""
+"""Cliente de Gemma para Ollama local o la Gemini API hospedada."""
 
 from __future__ import annotations
 
@@ -19,15 +19,32 @@ from extractor import (
 )
 
 
+PROVEEDOR = os.getenv("CHAMBA_PROVEEDOR", "ollama").strip().lower()
+if PROVEEDOR not in {"ollama", "gemini_api"}:
+    raise RuntimeError("CHAMBA_PROVEEDOR debe ser 'ollama' o 'gemini_api'.")
+
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434").rstrip("/")
+GEMINI_API_URL = os.getenv(
+    "GEMINI_API_URL", "https://generativelanguage.googleapis.com"
+).rstrip("/")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+MODELO_GEMINI_API = os.getenv("GEMMA_API_MODEL", "gemma-4-26b-a4b-it")
 MODELO_BASE = os.getenv("CHAMBA_MODELO_BASE", "gemma4:e2b")
-MODELO_VISION = os.getenv("CHAMBA_MODELO_VISION", "gemma3:4b")
+MODELO_VISION = os.getenv(
+    "CHAMBA_MODELO_VISION",
+    MODELO_GEMINI_API if PROVEEDOR == "gemini_api" else "gemma3:4b",
+)
 MODO_ANALISIS = os.getenv("CHAMBA_MODO_ANALISIS", "base").strip().lower()
 if MODO_ANALISIS not in {"base", "lora"}:
     raise RuntimeError("CHAMBA_MODO_ANALISIS debe ser 'base' o 'lora'.")
-MODELO_ANALISIS = os.getenv("CHAMBA_MODELO_ANALISIS", MODELO_BASE)
+MODELO_ANALISIS = os.getenv(
+    "CHAMBA_MODELO_ANALISIS",
+    MODELO_GEMINI_API if PROVEEDOR == "gemini_api" else MODELO_BASE,
+)
 NUM_CTX = 16384
 ADAPTADOR_ACTIVO = MODO_ANALISIS == "lora"
+if PROVEEDOR == "gemini_api" and ADAPTADOR_ACTIVO:
+    raise RuntimeError("La Gemini API hospedada no puede cargar el LoRA local.")
 MAX_PREDICCION_ANALISIS = 320
 MAX_PREDICCION_EXTRACCION = 1200
 KEEP_ALIVE = os.getenv("CHAMBA_KEEP_ALIVE", "10m")
@@ -131,10 +148,122 @@ RESPUESTA:
 
 
 class OllamaNoDisponible(RuntimeError):
-    """Error controlado cuando el servicio local no puede completar la llamada."""
+    """Error controlado cuando el proveedor no puede completar la llamada."""
+
+
+def _mime_imagen(imagen: bytes) -> str:
+    if imagen.startswith(b"\xff\xd8\xff"):
+        return "image/jpeg"
+    if imagen.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "image/png"
+    if len(imagen) >= 12 and imagen.startswith(b"RIFF") and imagen[8:12] == b"WEBP":
+        return "image/webp"
+    raise OllamaNoDisponible("La imagen no tiene un formato compatible con Gemma.")
+
+
+async def _generar_gemini_api(
+    modelo: str,
+    prompt: str,
+    *,
+    temperature: float,
+    imagen: bytes | None,
+    num_predict: int,
+) -> str:
+    if not GEMINI_API_KEY:
+        raise OllamaNoDisponible(
+            "Falta GEMINI_API_KEY en el backend. Configurala mediante Secret Manager."
+        )
+
+    partes: list[dict[str, Any]] = [{"text": prompt}]
+    if imagen is not None:
+        partes.insert(
+            0,
+            {
+                "inlineData": {
+                    "mimeType": _mime_imagen(imagen),
+                    "data": base64.b64encode(imagen).decode("ascii"),
+                }
+            },
+        )
+    cuerpo = {
+        "contents": [{"role": "user", "parts": partes}],
+        "generationConfig": {
+            "temperature": temperature,
+            "maxOutputTokens": num_predict,
+            "thinkingConfig": {"thinkingLevel": "minimal"},
+        },
+    }
+    url = f"{GEMINI_API_URL}/v1beta/models/{modelo}:generateContent"
+    timeout = httpx.Timeout(180.0, connect=10.0)
+    try:
+        async with httpx.AsyncClient(timeout=timeout) as cliente:
+            respuesta = await cliente.post(
+                url,
+                headers={"X-Goog-Api-Key": GEMINI_API_KEY},
+                json=cuerpo,
+            )
+            respuesta.raise_for_status()
+    except httpx.TimeoutException as error:
+        raise OllamaNoDisponible(
+            "Gemma hospedado excedio el tiempo de espera. Intenta nuevamente."
+        ) from error
+    except httpx.RequestError as error:
+        raise OllamaNoDisponible(
+            "No se pudo conectar con la Gemini API hospedada."
+        ) from error
+    except httpx.HTTPStatusError as error:
+        detalle = error.response.text[:300]
+        raise OllamaNoDisponible(
+            f"La Gemini API rechazo la solicitud ({error.response.status_code}): {detalle}"
+        ) from error
+
+    try:
+        datos = respuesta.json()
+        partes_salida = datos["candidates"][0]["content"]["parts"]
+        textos = [
+            parte["text"]
+            for parte in partes_salida
+            if isinstance(parte, dict)
+            and isinstance(parte.get("text"), str)
+            and not parte.get("thought", False)
+        ]
+    except (ValueError, KeyError, IndexError, TypeError) as error:
+        raise OllamaNoDisponible(
+            "La Gemini API respondio sin el contenido de texto esperado."
+        ) from error
+    contenido = "\n".join(textos).strip()
+    if not contenido:
+        raise OllamaNoDisponible("Gemma hospedado devolvio una respuesta vacia.")
+    return contenido
 
 
 async def _generar(
+    modelo: str,
+    prompt: str,
+    *,
+    temperature: float = 0,
+    imagen: bytes | None = None,
+    num_predict: int,
+) -> str:
+    async with _TURNO_INFERENCIA:
+        if PROVEEDOR == "gemini_api":
+            return await _generar_gemini_api(
+                modelo,
+                prompt,
+                temperature=temperature,
+                imagen=imagen,
+                num_predict=num_predict,
+            )
+        return await _generar_ollama(
+            modelo,
+            prompt,
+            temperature=temperature,
+            imagen=imagen,
+            num_predict=num_predict,
+        )
+
+
+async def _generar_ollama(
     modelo: str,
     prompt: str,
     *,
@@ -164,10 +293,9 @@ async def _generar(
 
     timeout = httpx.Timeout(180.0, connect=5.0)
     try:
-        async with _TURNO_INFERENCIA:
-            async with httpx.AsyncClient(timeout=timeout) as cliente:
-                respuesta = await cliente.post(f"{OLLAMA_URL}/api/chat", json=cuerpo)
-                respuesta.raise_for_status()
+        async with httpx.AsyncClient(timeout=timeout) as cliente:
+            respuesta = await cliente.post(f"{OLLAMA_URL}/api/chat", json=cuerpo)
+            respuesta.raise_for_status()
     except httpx.ConnectError as error:
         raise OllamaNoDisponible(
             "Ollama no responde. Levantalo con 'ollama serve' y confirma que "
@@ -273,8 +401,36 @@ async def analizar_aviso(
     )
 
 
+async def _estado_gemini_api() -> dict[str, Any]:
+    estado = {
+        "ok": False,
+        "modelo": MODELO_ANALISIS,
+        "modelo_vision": MODELO_VISION,
+        "proveedor": "gemini_api",
+        "ollama": False,
+        "adaptador": False,
+    }
+    if not GEMINI_API_KEY:
+        return estado
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as cliente:
+            respuesta = await cliente.get(
+                f"{GEMINI_API_URL}/v1beta/models/{MODELO_ANALISIS}",
+                headers={"X-Goog-Api-Key": GEMINI_API_KEY},
+            )
+            respuesta.raise_for_status()
+            datos = respuesta.json()
+    except (httpx.HTTPError, ValueError):
+        return estado
+    metodos = datos.get("supportedGenerationMethods", [])
+    estado["ok"] = "generateContent" in metodos
+    return estado
+
+
 async def estado_ollama() -> dict[str, Any]:
-    """Comprueba el servidor, los modelos requeridos y la capacidad de vision."""
+    """Comprueba el proveedor, los modelos requeridos y la capacidad de vision."""
+    if PROVEEDOR == "gemini_api":
+        return await _estado_gemini_api()
     try:
         async with httpx.AsyncClient(timeout=5.0) as cliente:
             respuesta = await cliente.get(f"{OLLAMA_URL}/api/tags")
@@ -285,6 +441,7 @@ async def estado_ollama() -> dict[str, Any]:
             "ok": False,
             "modelo": MODELO_ANALISIS,
             "modelo_vision": MODELO_VISION,
+            "proveedor": "ollama",
             "ollama": False,
             "adaptador": ADAPTADOR_ACTIVO,
         }
@@ -311,6 +468,7 @@ async def estado_ollama() -> dict[str, Any]:
         "ok": disponibles and vision,
         "modelo": MODELO_ANALISIS,
         "modelo_vision": MODELO_VISION,
+        "proveedor": "ollama",
         "ollama": True,
         "adaptador": ADAPTADOR_ACTIVO,
     }
