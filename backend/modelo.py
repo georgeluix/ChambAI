@@ -116,7 +116,7 @@ async def _generar(
 ) -> str:
     # /api/chat en lugar de /api/generate: Gemma 4 es un modelo con "thinking"
     # y en generate su salida cae en el campo thinking, dejando response vacio
-    # (verificado: 41 s y texto vacio por generate; 6 s y 100% parseable por chat).
+    # (verificado: 41 s y texto vacio por generate; 1.7 s por chat sin thinking).
     # think=False desactiva el razonamiento oculto, que aqui solo quema tokens.
     mensaje: dict[str, Any] = {"role": "user", "content": prompt}
     if imagen is not None:
