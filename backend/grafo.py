@@ -221,9 +221,13 @@ def consolidar(estado: EstadoAnalisis) -> dict[str, Any]:
             "de dos intentos. Revisa manualmente el aviso y las banderas de reglas."
         )
 
+    # El puntaje nunca contradice al nivel: un "alto" con la barra casi vacia
+    # (p. ej. 8/100) confunde al usuario y resta credibilidad en la demo.
+    puntaje = max(calcular_puntaje(banderas), {"alto": 70, "medio": 30}.get(riesgo, 0))
+
     resultado = {
         "riesgo": riesgo,
-        "puntaje": calcular_puntaje(banderas),
+        "puntaje": puntaje,
         "banderas": banderas,
         "explicacion": explicacion,
         "recomendacion": _recomendacion(riesgo),

@@ -177,6 +177,10 @@ def es_aviso_laboral(texto: str) -> bool:
         r"\b(?:vacante|vacantes|convocatoria|postula|postulacion)\b",
         r"\b(?:envia|enviar|manda|mandar)\s+(?:tu\s+)?cv\b",
         r"\btrabaja\s+con\s+nosotros\b",
+        # lenguaje de afiche: el rol femenino gancho es el titular y la
+        # invitacion reemplaza al verbo de convocatoria
+        r"\b(?:anfitriona|azafata|impulsadora|promotora|dama de compania)s?\b",
+        r"\bestarias? interesad[oa]s?\b",
     )
     if any(re.search(patron, limpio) for patron in patrones_directos):
         return True
@@ -188,6 +192,10 @@ def es_aviso_laboral(texto: str) -> bool:
         r"\b(?:requisito|requisitos|experiencia)\b",
         r"\b(?:planilla|beneficios|essalud|cts)\b",
         r"\b(?:empleo|trabajo|puesto|cargo|laboral)\b",
+        # los afiches conjugan el verbo y anuncian el monto sin decir "sueldo"
+        r"\btrabaj(?:a|ar|e|es)\b",
+        r"\bs/\.?\s*\d|\d+\s*(?:soles|dolares)\b",
+        r"\b(?:ganas?|ganaras?|ingresos?)\b",
     )
     coincidencias = sum(bool(re.search(patron, limpio)) for patron in grupos_laborales)
     return coincidencias >= 2
@@ -266,6 +274,86 @@ def detectar_cobro_postulante(texto: str) -> bool:
     return any(re.search(patron, limpio) for patron in patrones)
 
 
+def detectar_remuneracion_desproporcionada(texto: str) -> bool:
+    """Sueldos irreales para trabajo sin requisitos: el gancho clasico.
+
+    Umbrales conservadores para no marcar ofertas formales: un diario de mercado
+    ronda S/ 60-120 y un semanal formal rara vez se anuncia sobre S/ 1000. El
+    mensual solo cuenta si ademas el aviso presume de no pedir experiencia (un
+    sueldo tecnico alto con requisitos es normal).
+    """
+    limpio = normalizar(texto)
+    for monto, unidad in re.findall(
+        r"(?:s/?\.?\s*)?(\d{3,5})\s*(?:soles?\s*)?(?:al?\s+|por\s+)?"
+        r"(diario|dia|semanal|semana|mensual|mes)",
+        limpio,
+    ):
+        valor = int(monto)
+        if unidad in ("diario", "dia") and valor >= 200:
+            return True
+        if unidad in ("semanal", "semana") and valor >= 1000:
+            return True
+        if unidad in ("mensual", "mes") and valor >= 4000 and re.search(
+            r"\bsin (?:experiencia|requisitos|estudios)\b|"
+            r"\bno (?:se )?(?:pide|necesitas?|requiere)\b",
+            limpio,
+        ):
+            return True
+    return False
+
+
+_GANCHO_NOCTURNO = (
+    "anfitriona",
+    "night club",
+    "nightclub",
+    "nigth club",
+    "karaoke",
+    "dama de compania",
+    "damas de compania",
+    "reservados",
+    "personal de imagen",
+    "clientes vip",
+)
+
+
+def _sin_empleador_identificable(limpio: str) -> bool:
+    return not re.search(r"\bruc\b|\bs\.?a\.?c?\b|\be\.?i\.?r\.?l\b|\bs\.?r\.?l\b", limpio)
+
+
+def detectar_gancho_sin_empleador(texto: str) -> bool:
+    """Rubro de captacion nocturna (night club, anfitrionaje, damas de
+    compania) sin razon social ni RUC que responda por el aviso.
+
+    La combinacion es la que la casuistica de CHS/MININTER señala como vector
+    tipico; un local formal con RUC visible no dispara la regla.
+    """
+    limpio = normalizar(texto)
+    return any(g in limpio for g in _GANCHO_NOCTURNO) and _sin_empleador_identificable(limpio)
+
+
+def detectar_empleador_anonimo(texto: str) -> bool:
+    """Aviso sin razon social/RUC cuyo unico canal es un numero personal.
+
+    No implica captacion por si solo (por eso es critica, no fuerza alto), pero
+    un aviso asi nunca deberia salir "bajo" impecable: no hay contra quien
+    reclamar. Un correo, portal, sede o direccion desactivan la regla.
+    """
+    limpio = normalizar(texto)
+    if not _sin_empleador_identificable(limpio):
+        return False
+    if not _PATRON_TELEFONO.search(texto):
+        return False
+    canal_institucional = bool(
+        re.search(r"[\w.+-]+@[\w.-]+\.[a-z]{2,}", limpio)
+        or re.search(
+            r"\b(?:portal|pagina web|sitio web|www\.|linkedin|bolsa de trabajo|"
+            r"oficina|sede|direccion|avenida|jiron|presentar cv)\b|\b(?:av|jr)\.",
+            limpio,
+        )
+    )
+    return not canal_institucional
+
+
 def telefonos_peruanos_enmascarados(texto: str) -> list[str]:
     """Devuelve telefonos hallados sin exponer sus ultimos seis digitos."""
     telefonos: list[str] = []
@@ -322,6 +410,34 @@ def aplicar_reglas(texto: str) -> dict[str, Any]:
         )
         riesgo_forzado = "alto"
 
+    if detectar_remuneracion_desproporcionada(texto):
+        banderas.append(
+            {
+                "texto": "Remuneracion desproporcionada para el puesto y sin sustento",
+                "gravedad": "critica",
+                "origen": "regla",
+            }
+        )
+
+    if detectar_empleador_anonimo(texto):
+        banderas.append(
+            {
+                "texto": "Empleador no identificado: sin razon social ni RUC verificable",
+                "gravedad": "critica",
+                "origen": "regla",
+            }
+        )
+
+    if detectar_gancho_sin_empleador(texto):
+        banderas.append(
+            {
+                "texto": "Filtro por sexo, edad y apariencia fisica sin relacion con la funcion",
+                "gravedad": "grave",
+                "origen": "regla",
+            }
+        )
+        riesgo_forzado = "alto"
+
     solo_mensajeria = contacto_solo_mensajeria(texto)
     if solo_mensajeria:
         banderas.append(
@@ -331,6 +447,12 @@ def aplicar_reglas(texto: str) -> dict[str, Any]:
                 "origen": "regla",
             }
         )
+
+    # regla del catalogo: dos o mas criticas configuran riesgo alto por si solas
+    if riesgo_forzado is None:
+        criticas = sum(1 for b in banderas if b["gravedad"] == "critica")
+        if criticas >= 2:
+            riesgo_forzado = "alto"
 
     return {
         "banderas": banderas,
