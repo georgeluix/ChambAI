@@ -1,0 +1,170 @@
+{
+ "modelo": "gemma4:e2b",
+ "exactitud_pct": 85.0,
+ "omisiones_alto": 0,
+ "graves": 0,
+ "formato_pct": 100.0,
+ "tok_s_media": 117.0,
+ "casos": [
+  {
+   "caso": 1,
+   "esperado": "alto",
+   "obtenido": "alto",
+   "formato_valido": true,
+   "tok_s": 57.8,
+   "respuesta": "RIESGO: alto\nBANDERAS:\n- Filtro por sexo, edad y apariencia fisica sin relacion con la funcion\n- Remuneracion alta prometida junto con control de alojamiento y transporte\n- Contacto exclusivo por WhatsApp para la contratación\n- Promesa de enseñanza sin experiencia previa\nEXPLICACION: El aviso presenta múltiples señales de alerta típicas de explotación: se busca a mujeres jóvenes, se ofrecen condiciones atractivas pero se controla el alojamiento y el transporte, y la comunicación es privada. Se recomienda reportar a la Linea 1818."
+  },
+  {
+   "caso": 2,
+   "esperado": "alto",
+   "obtenido": "alto",
+   "formato_valido": true,
+   "tok_s": 123.5,
+   "respuesta": "RIESGO: alto\nBANDERAS:\n- Aislamiento prolongado (45 días) en el lugar de trabajo\n- Control sobre el movimiento y alojamiento\n- Pago total prometido sin detalles contractuales claros\n- Contacto directo por WhatsApp para reclutamiento\nEXPLICACION: La oferta incluye condiciones de aislamiento y control del movimiento, lo cual es una señal de alerta grave. El pago total prometido junto con la falta de detalles contractuales sugiere un alto riesgo de explotación laboral o trata de personas. Reportar a la Linea 1818."
+  },
+  {
+   "caso": 3,
+   "esperado": "alto",
+   "obtenido": "alto",
+   "formato_valido": true,
+   "tok_s": 123.1,
+   "respuesta": "RIESGO: alto\nBANDERAS:\n- Alojamiento incluido como control\n- Pago en efectivo y horario nocturno\n- Solicitud de discreción familiar\n- Comunicación solicitada por privado\nEXPLICACION: El aviso presenta múltiples señales de alerta relacionadas con la explotación, incluyendo alojamiento obligatorio, pago en efectivo y la exigencia de ocultar la información a la familia. Esto sugiere un riesgo muy alto de captación vinculada a trata de personas. Reportar a la Linea 1818."
+  },
+  {
+   "caso": 4,
+   "esperado": "alto",
+   "obtenido": "alto",
+   "formato_valido": true,
+   "tok_s": 121.0,
+   "respuesta": "RIESGO: alto\nBANDERAS:\n- Solicitud de pago inicial para exámenes y uniformes\n- Uso de métodos informales de pago (Yape)\n- Promesa de trabajo fácil sin requisitos formales\nEXPLICACION: El aviso utiliza tácticas de urgencia y solicita un pago inicial, lo cual es una señal de alerta grave. La solicitud de dinero por adelantado para obtener un empleo sugiere un posible esquema de explotación o fraude. Reportar a la Linea 1818."
+  },
+  {
+   "caso": 5,
+   "esperado": "alto",
+   "obtenido": "alto",
+   "formato_valido": true,
+   "tok_s": 121.5,
+   "respuesta": "RIESGO: alto\nBANDERAS:\n- Solicitud de fotos explícitas y medidas por mensajeria privada\n- Énfasis en la apariencia física como requisito principal\n- Coordinación de entrevista en un lugar específico (hotel) con información interna\nEXPLICACION: Este aviso presenta claras señales de explotación sexual. La solicitud de fotografías íntimas y el establecimiento de una entrevista en un entorno controlado sugieren que el propósito del reclutamiento no es laboral sino la explotación. Se recomienda reportar a la Linea 1818."
+  },
+  {
+   "caso": 6,
+   "esperado": "alto",
+   "obtenido": "alto",
+   "formato_valido": true,
+   "tok_s": 124.4,
+   "respuesta": "RIESGO: alto\nBANDERAS:\n- Control sobre el transporte y viaje\n- Solicitud de documentos sensibles por adelantado (DNI, partida de nacimiento)\n- Promesa de alojamiento y manutención incluida\n- Contacto exclusivo por WhatsApp\nEXPLICACION: El aviso presenta múltiples señales de alerta típicas de trata de personas, incluyendo la gestión del pasaje y la exigencia de documentos personales para el traslado. Esto indica una posible explotación laboral forzada. Reportar a la Linea 1818."
+  },
+  {
+   "caso": 7,
+   "esperado": "alto",
+   "obtenido": "alto",
+   "formato_valido": true,
+   "tok_s": 115.0,
+   "respuesta": "RIESGO: alto\nBANDERAS:\n- Uso de lenguaje sugestivo (\"damas de compañia\")\n- Énfasis en la actitud y discreción sobre la experiencia\n- Instrucción para contactar por número privado y persona específica\nEXPLICACION: El aviso utiliza un lenguaje ambiguo y solicita información a través de un contacto personal, lo cual es una señal de alerta. La falta de especificación clara del puesto y el énfasis en la \"actitud\" pueden indicar explotación o coerción. Reportar a la Linea 1818."
+  },
+  {
+   "caso": 8,
+   "esperado": "alto",
+   "obtenido": "alto",
+   "formato_valido": true,
+   "tok_s": 116.8,
+   "respuesta": "RIESGO: alto\nBANDERAS:\n- Reclutamiento de menores de edad\n- Solicitud de fotos y datos personales por WhatsApp\n- Promesa de adelanto de dinero y movilidad incluida\n- Trabajo en entorno nocturno con poca especificación\nEXPLICACION: El aviso presenta múltiples señales de alerta relacionadas con la explotación, incluyendo el reclutamiento de menores, la solicitud de información personal sensible y la promesa de beneficios económicos inmediatos. Esto sugiere un alto riesgo de captación vinculada a trata de personas. Reportar a la Linea 1818."
+  },
+  {
+   "caso": 9,
+   "esperado": "medio",
+   "obtenido": "medio",
+   "formato_valido": true,
+   "tok_s": 119.3,
+   "respuesta": "RIESGO: medio\nBANDERAS:\n- El sueldo se deja abierto para la entrevista, lo que dificulta la evaluación de la oferta inicial\n- Coordinación exclusiva por WhatsApp/teléfono para el reclutamiento\nEXPLICACION: Aunque se mencionan beneficios legales como el bono nocturno, la falta de especificación del salario y la coordinación directa a través de mensajería privada indican un proceso de reclutamiento que requiere mayor cautela."
+  },
+  {
+   "caso": 10,
+   "esperado": "medio",
+   "obtenido": "alto",
+   "formato_valido": true,
+   "tok_s": 121.6,
+   "respuesta": "RIESGO: alto\nBANDERAS:\n- Promesa de ingresos ilimitados sin estructura salarial definida\n- Ausencia de sueldo base inicial (primeros 2 meses)\n- Contacto exclusivo por WhatsApp para la contratación\nEXPLICACION: La promesa de ingresos ilimitados sin un sueldo base establecido y el retraso en el pago del salario inicial son señales claras de posible explotación laboral. Se recomienda reportar a la Linea 1818."
+  },
+  {
+   "caso": 11,
+   "esperado": "medio",
+   "obtenido": "alto",
+   "formato_valido": true,
+   "tok_s": 122.1,
+   "respuesta": "RIESGO: alto\nBANDERAS:\n- Alojamiento provisto en campamento\n- Traslado periódico de la ciudad\n- Régimen laboral agrario\nEXPLICACION: La oferta incluye alojamiento y un régimen de trabajo que implica movimiento constante, lo cual es una señal de alerta. El control sobre el alojamiento y el traslado puede indicar explotación laboral. Recomiendo reportar a la Linea 1818."
+  },
+  {
+   "caso": 12,
+   "esperado": "medio",
+   "obtenido": "alto",
+   "formato_valido": true,
+   "tok_s": 122.3,
+   "respuesta": "RIESGO: alto\nBANDERAS:\n- Pago en efectivo semanal sin contrato formal\n- Ausencia de contrato laboral inicial\n- Contacto a través de persona específica y dirección física\nEXPLICACION: El pago en efectivo y la falta de un contrato formal indican una relación laboral informal y potencialmente explotadora. La solicitud de contacto a través de una persona específica y una dirección física sugiere un control directo sobre el trabajador."
+  },
+  {
+   "caso": 13,
+   "esperado": "medio",
+   "obtenido": "medio",
+   "formato_valido": true,
+   "tok_s": 116.7,
+   "respuesta": "RIESGO: medio\nBANDERAS:\n- Empleador en proceso de formalización\n- Salario bajo para el horario y la responsabilidad\nEXPLICACION: La falta de formalización del negocio genera incertidumbre laboral. Aunque se ofrecen horarios definidos, la informalidad aumenta el riesgo de explotación si no existen contratos o beneficios legales claros."
+  },
+  {
+   "caso": 14,
+   "esperado": "medio",
+   "obtenido": "medio",
+   "formato_valido": true,
+   "tok_s": 119.0,
+   "respuesta": "RIESGO: medio\nBANDERAS:\n- Contacto exclusivo por WhatsApp para reclutamiento\n- Requisitos específicos de licencia y antecedentes\nEXPLICACION: Aunque el aviso menciona requisitos formales y beneficios en planilla, la insistencia en un contacto privado por WhatsApp puede ser una señal de control. Se recomienda verificar la legitimidad de la empresa antes de proceder con la solicitud."
+  },
+  {
+   "caso": 15,
+   "esperado": "bajo",
+   "obtenido": "bajo",
+   "formato_valido": true,
+   "tok_s": 122.6,
+   "respuesta": "RIESGO: bajo\nBANDERAS:\n- Ninguna señal de alerta detectada\nEXPLICACION: El aviso incluye datos legales como el RUC y ofrece beneficios laborales establecidos por ley. La convocatoria se realiza a través de un canal formal, lo que reduce significativamente el riesgo de captación vinculada a trata."
+  },
+  {
+   "caso": 16,
+   "esperado": "bajo",
+   "obtenido": "bajo",
+   "formato_valido": true,
+   "tok_s": 119.4,
+   "respuesta": "RIESGO: bajo\nBANDERAS:\n- Ninguna señal de alerta detectada\nEXPLICACION: El aviso proviene de una entidad gubernamental reconocida y sigue un proceso formal de convocatoria CAS. La información proporcionada es coherente con un proceso de contratación pública legítimo."
+  },
+  {
+   "caso": 17,
+   "esperado": "bajo",
+   "obtenido": "bajo",
+   "formato_valido": true,
+   "tok_s": 117.0,
+   "respuesta": "RIESGO: bajo\nBANDERAS:\n- Ninguna señal de alerta detectada\nEXPLICACION: El aviso presenta requisitos profesionales claros, especifica el salario y ofrece un canal de postulación formal. No se identifican señales de captacion vinculadas a trata de personas en este texto."
+  },
+  {
+   "caso": 18,
+   "esperado": "bajo",
+   "obtenido": "bajo",
+   "formato_valido": true,
+   "tok_s": 122.9,
+   "respuesta": "RIESGO: bajo\nBANDERAS:\n- Ninguna señal de alerta detectada\nEXPLICACION: El aviso presenta una estructura profesional con requisitos técnicos claros, un rango salarial definido y la promesa de contrato en planilla con beneficios sociales. No se identifican indicadores de explotación o trata de personas."
+  },
+  {
+   "caso": 19,
+   "esperado": "bajo",
+   "obtenido": "bajo",
+   "formato_valido": true,
+   "tok_s": 117.9,
+   "respuesta": "RIESGO: bajo\nBANDERAS:\n- Ninguna señal de alerta detectada\nEXPLICACION: El aviso incluye datos de identificación de la empresa (RUC), especifica requisitos legales y ofrece beneficios laborales formales. La solicitud de presentar el CV en una dirección física sugiere un proceso formal de reclutamiento."
+  },
+  {
+   "caso": 20,
+   "esperado": "bajo",
+   "obtenido": "bajo",
+   "formato_valido": true,
+   "tok_s": 117.0,
+   "respuesta": "RIESGO: bajo\nBANDERAS:\n- Ninguna señal de alerta detectada\nEXPLICACION: El aviso presenta requisitos profesionales claros, una oferta salarial en planilla y la mención de viáticos cubiertos para el trabajo de campo. La convocatoria parece seguir un proceso formal de reclutamiento institucional."
+  }
+ ]
+}

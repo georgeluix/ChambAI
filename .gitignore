@@ -10,3 +10,15 @@ dist/
 .env.local
 .env.*.local
 npm-debug.log*
+
+# Entrenamiento: logs y checkpoints intermedios
+entrenamiento/train.log
+entrenamiento/checkpoint-*/
+entrenamiento/*.antes-*
+
+# Pesos del adaptador LoRA: 101 MB supera el limite de GitHub, y ademas es el
+# adaptador descartado (ver reto 6 del writeup: no sobrevive a la
+# serializacion). Se conserva adapter_config.json, que es lo reproducible.
+entrenamiento/adaptador-lora/adapter_model.safetensors
+entrenamiento/adaptador-lora/tokenizer.json
+entrenamiento/adaptador-lora/training_args.bin
