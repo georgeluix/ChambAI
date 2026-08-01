@@ -42,8 +42,7 @@ Ollama vive en Windows y FastAPI en WSL. Con Ollama ya iniciado en Windows:
 # WSL, desde la raiz del repositorio
 source ~/venv-hackathon/bin/activate
 cd backend
-OLLAMA_URL=http://172.26.176.1:11434 \
-  uvicorn main:app --host 0.0.0.0 --port 8000
+bash iniciar-wsl.sh
 ```
 
 En PowerShell:
